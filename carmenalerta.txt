@@ -1,0 +1,86 @@
+Aquí tienes una propuesta de especificaciones técnicas y funcionales (specs) para tu aplicación. Está estructurada para abarcar tanto el lado del cliente (app/web) como la lógica del servidor, enfocándose en tus requerimientos de mapas isométricos y el sistema de confianza.
+
+---
+
+## 1. Arquitectura General
+
+Para que funcione fluidamente como Web App y Aplicación Móvil con una sola base de código, el enfoque ideal es una arquitectura híbrida o PWA.
+
+* **Frontend (App y Web):** React Native (con Expo para web) o un stack web puro (HTML/CSS/JS moderno) empaquetado como Progressive Web App (PWA) o con Capacitor.
+* **Backend:** Java (Spring Boot) o Node.js, ideales para manejar conexiones en tiempo real.
+* **Base de Datos:** PostgreSQL con la extensión **PostGIS** (esencial para manejar coordenadas y consultas espaciales eficientes).
+* **Sockets/Tiempo Real:** WebSockets (Socket.io o SignalR) para que las notificaciones (ej. "ya regresó la luz") lleguen al instante sin tener que recargar.
+
+---
+
+## 2. El Mapa Isométrico y la UI
+
+Desarrollar un mapa isométrico interactivo requiere una librería gráfica potente, ya que los mapas tradicionales (Google Maps) son cenitales (top-down).
+
+* **Motor de Mapa:**
+* *Opción A:* **Mapbox GL JS**. Permite inclinar la cámara (pitch), rotarla y renderizar edificios en 3D. Bloqueando los controles de rotación e inclinación, puedes simular una vista isométrica perfecta.
+* *Opción B:* **Three.js**. Si la ciudad o zona es pequeña y quieres un estilo visual tipo videojuego (completamente isométrico y personalizado).
+
+
+* **Capa de Datos (Marcadores):**
+* Los incidentes deben representarse con modelos 3D o pines isométricos que "floten" sobre la calle.
+* **Código de Colores / Rutas:**
+* 🔴 Rojo intenso: Calle inundada (intransitable).
+* 🟠 Naranja: Tráfico pesado / Accidente.
+* ⚫ Gris oscuro / Negro: Zona sin luz.
+* 🟢 Verde brillante (temporal): Luz restaurada o vía recién despejada.
+
+
+
+
+
+---
+
+## 3. Tipos de Incidentes y Flujos
+
+Cada reporte debe tener un tiempo de vida (TTL - Time To Live) o un evento de cierre.
+
+| Tipo de Incidente | Información Requerida | Cierre del Incidente (Resolución) |
+| --- | --- | --- |
+| **Tráfico / Choque** | Carriles afectados, foto opcional. | Expiración por tiempo (ej. 2 horas) o confirmación de despejado. |
+| **Inundación** | Nivel del agua (barda, banqueta, llanta). | Votos de usuarios indicando que el agua bajó. |
+| **Corte de Luz** | Colonias/calles afectadas. | **Alerta dual:** El sistema crea el evento y, cuando los usuarios reportan que regresó, dispara una *notificación push* masiva a la zona: *"Luz restaurada en la zona X"*. |
+
+---
+
+## 4. Sistema de Reputación y Verificación (Motor de Confianza)
+
+Para evitar reportes falsos o vandalismo en el mapa, el sistema no dependerá de un administrador, sino de la comunidad.
+
+### Niveles de Usuario (Trust Score)
+
+Todo usuario inicia con un *Trust Score* (ej. 100 puntos). Las interacciones modifican este puntaje:
+
+1. **Nivel 1: Novato / No Verificado (0 - 200 puntos)**
+* *Permisos:* Puede crear reportes, pero **no aparecen en el mapa público** inmediatamente. Requieren que al menos 2 usuarios de mayor nivel confirmen ("Yo también lo veo" / "Confirmo").
+
+
+2. **Nivel 2: Reportero Confiable (201 - 1000 puntos)**
+* *Permisos:* Sus reportes se publican en el mapa al instante. Sus votos para validar incidentes tienen peso doble.
+
+
+3. **Nivel 3: Verificado / "Sheriff" Vial (1000+ puntos)**
+* *Permisos:* Pueden cerrar incidentes de otros usuarios ("La calle ya no está inundada"). Sus reportes generan notificaciones push inmediatas al resto de la comunidad.
+
+
+
+### Sistema de Calificación de Reportes
+
+* Cada marcador en el mapa tiene dos botones: **👍 "Sigue ahí"** y **👎 "No es cierto / Ya se quitó"**.
+* Si un reporte recibe muchos 👎, desaparece del mapa y el creador original pierde *Trust Score*.
+* Si un reporte recibe muchos 👍, el creador gana *Trust Score*.
+
+---
+
+## 5. Especificaciones de Notificaciones Push
+
+Las notificaciones no deben saturar al usuario, deben estar basadas en **Geocercas** (Geofencing):
+
+* **Notificación en Ruta:** Si el usuario tiene la app abierta o está rastreando su ruta, se le avisa si a menos de 2 km adelante se acaba de reportar una inundación.
+* **Zonas Favoritas:** El usuario puede guardar "Casa" o "Trabajo". Si hay un corte de luz en "Casa", le llega una alerta sin importar dónde esté.
+* **La Notificación de Retorno:** Cuando el algoritmo detecta que suficientes usuarios confirmaron el regreso de la luz, envía el mensaje: *⚡ "Servicio eléctrico restablecido en tu zona guardada: Casa."*
