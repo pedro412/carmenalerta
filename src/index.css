@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f9fafb;
+}
+
+/* Custom pulsing animation for map marker */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.leaflet-marker-pulse {
+  position: relative;
+}
+
+.leaflet-marker-pulse::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: -100%;
+  width: 300%;
+  height: 300%;
+  border-radius: 50%;
+  background-color: rgba(239, 68, 68, 0.4);
+  animation: pulse-ring 2s infinite ease-out;
+}
