@@ -1,0 +1,836 @@
+[
+  {
+    "lat": 18.6351953,
+    "lon": -91.8331322,
+    "name": "Iglesia del Jésus",
+    "type": "place_of_worship"
+  },
+  {
+    "lat": 18.6314642,
+    "lon": -91.829715,
+    "name": "Iglesia del Guanal",
+    "type": "place_of_worship"
+  },
+  {
+    "lat": 18.6479308,
+    "lon": -91.8148958,
+    "name": "Wing's Army",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6400702,
+    "lon": -91.8385731,
+    "name": "Mercado Alonso Felipe de Andrade",
+    "type": "marketplace"
+  },
+  {
+    "lat": 18.6405785,
+    "lon": -91.8389165,
+    "name": "La Campesina",
+    "type": "marketplace"
+  },
+  {
+    "lat": 18.6384447,
+    "lon": -91.8345226,
+    "name": "Fuente del centro Cultural UNACAR",
+    "type": "fountain"
+  },
+  {
+    "lat": 18.6450893,
+    "lon": -91.8182704,
+    "name": "Glorieta del Camaron",
+    "type": "fountain"
+  },
+  {
+    "lat": 18.6385859,
+    "lon": -91.8346035,
+    "name": "Centro cultural de la UNACAR",
+    "type": "theatre"
+  },
+  {
+    "lat": 18.638404,
+    "lon": -91.8381322,
+    "name": "Los juegos del Malecon",
+    "type": "playground"
+  },
+  {
+    "lat": 18.6397764,
+    "lon": -91.8380791,
+    "name": "Mercado de las Artesanias",
+    "type": "artwork"
+  },
+  {
+    "lat": 18.6393189,
+    "lon": -91.837746,
+    "name": "La Calzada",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6633931,
+    "lon": -91.832381,
+    "name": "Los juegos de playa Norte",
+    "type": "playground"
+  },
+  {
+    "lat": 18.6568346,
+    "lon": -91.7921895,
+    "name": "Chedraui",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6456176,
+    "lon": -91.8011936,
+    "name": "Wall Mart",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6494399,
+    "lon": -91.8044551,
+    "name": "Sanborns",
+    "type": "books"
+  },
+  {
+    "lat": 18.6464736,
+    "lon": -91.8018394,
+    "name": "Sport City",
+    "type": "sports_centre"
+  },
+  {
+    "lat": 18.6533444,
+    "lon": -91.807353,
+    "name": "Liverpool",
+    "type": "department_store"
+  },
+  {
+    "lat": 18.6469809,
+    "lon": -91.8131036,
+    "name": "Holiday Inn",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6494826,
+    "lon": -91.8134255,
+    "name": "Fiesta Inn",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6492666,
+    "lon": -91.8142248,
+    "name": "The One",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6475599,
+    "lon": -91.8152194,
+    "name": "La Mega Comercial",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.660024,
+    "lon": -91.7762283,
+    "name": "Colegio Joaquin Clausell",
+    "type": "school"
+  },
+  {
+    "lat": 18.653974,
+    "lon": -91.8076528,
+    "name": "Zentralia",
+    "type": "mall"
+  },
+  {
+    "lat": 18.6356523,
+    "lon": -91.8348671,
+    "name": "Fuente de Anton de Alaminos",
+    "type": "fountain"
+  },
+  {
+    "lat": 18.6625373,
+    "lon": -91.8314068,
+    "name": "Playa Norte Bus Station",
+    "type": "bus_station"
+  },
+  {
+    "lat": 18.6371317,
+    "lon": -91.8347235,
+    "name": "Ysa",
+    "type": "pharmacy"
+  },
+  {
+    "lat": 18.6367464,
+    "lon": -91.8346161,
+    "name": "Domino`s Pizza",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6547266,
+    "lon": -91.8088511,
+    "name": "Toks",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6584946,
+    "lon": -91.8115899,
+    "name": "Jas",
+    "type": "guest_house"
+  },
+  {
+    "lat": 18.663538,
+    "lon": -91.8300489,
+    "name": "Restaurant Carmita",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6635079,
+    "lon": -91.8302505,
+    "name": "Restauran ls Delfines",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6638277,
+    "lon": -91.8221637,
+    "name": "Azul de Playa",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6638073,
+    "lon": -91.8221051,
+    "name": "Iguanas Beach",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6639989,
+    "lon": -91.8212394,
+    "name": "La Camelia Pisto Bar Banda",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6642282,
+    "lon": -91.8206932,
+    "name": "Las Mandarinas",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6647482,
+    "lon": -91.8197521,
+    "name": "El Tiburón",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6647078,
+    "lon": -91.8195915,
+    "name": "El Paisano Sinaloense",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6646981,
+    "lon": -91.8193699,
+    "name": "Marisquería verdejo Bulnes",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6623929,
+    "lon": -91.8314132,
+    "name": "Torre 7 Pemex",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6639929,
+    "lon": -91.8170755,
+    "name": "Narnia Bar",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6644112,
+    "lon": -91.8172091,
+    "name": "El patrón en la playa",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6645779,
+    "lon": -91.8151392,
+    "name": "Circus Sea Food",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6645912,
+    "lon": -91.8145018,
+    "name": "Neverland Cocktail Bar & Lounge",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6642041,
+    "lon": -91.8151431,
+    "name": "Restaurant Chiper",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6636877,
+    "lon": -91.8145132,
+    "name": "Ibiza Night Club",
+    "type": "nightclub"
+  },
+  {
+    "lat": 18.6641323,
+    "lon": -91.8127106,
+    "name": "Club Naval Ciudad Del Carmen",
+    "type": "dance"
+  },
+  {
+    "lat": 18.6641625,
+    "lon": -91.8131637,
+    "name": "Restaurante Q' tal",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6623449,
+    "lon": -91.8316392,
+    "name": "Casa Canela",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6623373,
+    "lon": -91.8315614,
+    "name": "Shotimilco",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6623017,
+    "lon": -91.8317545,
+    "name": "Los Trompos",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6623068,
+    "lon": -91.8318135,
+    "name": "La Pigua Restaurante",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6624618,
+    "lon": -91.8324894,
+    "name": "Sensei Sushi Bar",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6620044,
+    "lon": -91.8326423,
+    "name": "City Express Ciudad del Carmen Oficial",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6616484,
+    "lon": -91.8343444,
+    "name": "Chomex",
+    "type": "bank"
+  },
+  {
+    "lat": 18.6620338,
+    "lon": -91.8332722,
+    "name": "Krudelios",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6616893,
+    "lon": -91.8340825,
+    "name": "La Cabaña de Don Pepe",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6557815,
+    "lon": -91.7924425,
+    "name": "Studio",
+    "type": "yes"
+  },
+  {
+    "lat": 18.6554923,
+    "lon": -91.7899624,
+    "name": "Hotel Extended Suites Ciudad del Carmen Aeropuerto",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6565226,
+    "lon": -91.7906714,
+    "name": "Famsa",
+    "type": "department_store"
+  },
+  {
+    "lat": 18.6552008,
+    "lon": -91.7893119,
+    "name": "Hyatt Place Ciudad del Carmen",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6562334,
+    "lon": -91.7893837,
+    "name": "Restaurante de Mariscos Jandeiros",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6555576,
+    "lon": -91.788664,
+    "name": "Los Trompos",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6546876,
+    "lon": -91.7889419,
+    "name": "Iglesia de Jesucristo de los Santos de los Últimos Días",
+    "type": "place_of_worship"
+  },
+  {
+    "lat": 18.6551543,
+    "lon": -91.7894019,
+    "name": "Jangadeiro Frutos Do Mar",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.654399,
+    "lon": -91.789876,
+    "name": "Pareque de Bomberos",
+    "type": "park"
+  },
+  {
+    "lat": 18.6547385,
+    "lon": -91.7899366,
+    "name": "Jangadeiro Frutos Do Mar",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6551901,
+    "lon": -91.7901193,
+    "name": "Dairy Queen",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6553968,
+    "lon": -91.790241,
+    "name": "Little Caesars",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6557604,
+    "lon": -91.7904171,
+    "name": "Boston's Restaurant & Sports Bar",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6563147,
+    "lon": -91.7925061,
+    "name": "Chedraui",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6559261,
+    "lon": -91.7892056,
+    "name": "Bikram Yoga Ciudad del Carmen",
+    "type": "fitness_centre"
+  },
+  {
+    "lat": 18.6535055,
+    "lon": -91.7928657,
+    "name": "Servicio De Combustibles Raymel SA de CV",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.6542541,
+    "lon": -91.7912374,
+    "name": "KFC",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6535505,
+    "lon": -91.79364,
+    "name": "AutoZone",
+    "type": "car_parts"
+  },
+  {
+    "lat": 18.6539519,
+    "lon": -91.793388,
+    "name": "Patio de Transporte Rodriver",
+    "type": "yes"
+  },
+  {
+    "lat": 18.6537339,
+    "lon": -91.7923068,
+    "name": "Domino's",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.653765,
+    "lon": -91.7926648,
+    "name": "Bancomer",
+    "type": "atm"
+  },
+  {
+    "lat": 18.6536093,
+    "lon": -91.7926429,
+    "name": "Pemex",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.653194,
+    "lon": -91.7940637,
+    "name": "City Express Junior Ciudad del Carmen Aeropuerto",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.654163,
+    "lon": -91.7945567,
+    "name": "Antojitos Maxicanos",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6553726,
+    "lon": -91.7822696,
+    "name": "Bodega Aurrera",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6556799,
+    "lon": -91.7823268,
+    "name": "Bancomer",
+    "type": "atm"
+  },
+  {
+    "lat": 18.6560715,
+    "lon": -91.7819262,
+    "name": "Chili's",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6551436,
+    "lon": -91.7822569,
+    "name": "Bodega BioFood Ciudad del Carmen",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6585796,
+    "lon": -91.7780887,
+    "name": "Restaurante de sushi",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6552344,
+    "lon": -91.7813813,
+    "name": "Hampton Inn by Hilton Ciudad del Carmen Campeche",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6581026,
+    "lon": -91.7782565,
+    "name": "Carnitas Y Chicharrones Chuina",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6584524,
+    "lon": -91.7774384,
+    "name": "Tacos Ramón",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6528646,
+    "lon": -91.8064074,
+    "name": "Cinépolis",
+    "type": "cinema"
+  },
+  {
+    "lat": 18.6505941,
+    "lon": -91.8134648,
+    "name": "Burger King",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6522627,
+    "lon": -91.8149039,
+    "name": "Barezzito",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6513261,
+    "lon": -91.8126242,
+    "name": "Mc Donald´s",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6504736,
+    "lon": -91.8128087,
+    "name": "Cinemex",
+    "type": "cinema"
+  },
+  {
+    "lat": 18.650332,
+    "lon": -91.813292,
+    "name": "BestDay Plaza Real, Ciudad Del Carmen",
+    "type": "yes"
+  },
+  {
+    "lat": 18.6505519,
+    "lon": -91.812443,
+    "name": "Dairy Queen",
+    "type": "fast_food"
+  },
+  {
+    "lat": 18.6504947,
+    "lon": -91.8123222,
+    "name": "Shasa",
+    "type": "yes"
+  },
+  {
+    "lat": 18.635749,
+    "lon": -91.8334172,
+    "name": "depa alquiler",
+    "type": "guest_house"
+  },
+  {
+    "lat": 18.661794,
+    "lon": -91.8186862,
+    "name": "Rush",
+    "type": "cafe"
+  },
+  {
+    "lat": 18.6620528,
+    "lon": -91.8187649,
+    "name": "Cevichito",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6409263,
+    "lon": -91.8386425,
+    "name": "Regis",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6290294,
+    "lon": -91.8196526,
+    "name": "Playa Manigua",
+    "type": "attraction"
+  },
+  {
+    "lat": 18.6316376,
+    "lon": -91.8296698,
+    "name": "parque guanal",
+    "type": "school"
+  },
+  {
+    "lat": 18.6456671,
+    "lon": -91.8164426,
+    "name": "Suzuki",
+    "type": "car"
+  },
+  {
+    "lat": 18.6487632,
+    "lon": -91.8149392,
+    "name": "Cityexpress junior",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6485025,
+    "lon": -91.8147194,
+    "name": "Paradise Island",
+    "type": "casino"
+  },
+  {
+    "lat": 18.648704,
+    "lon": -91.8174702,
+    "name": "Lapa Lapa",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6491144,
+    "lon": -91.8153419,
+    "name": "Oxxo",
+    "type": "convenience"
+  },
+  {
+    "lat": 18.6642559,
+    "lon": -91.8223049,
+    "name": "Iguanas bar",
+    "type": "bar"
+  },
+  {
+    "lat": 18.6537759,
+    "lon": -91.8162336,
+    "name": "Hotel Lossandes",
+    "type": "hotel"
+  },
+  {
+    "lat": 18.6545671,
+    "lon": -91.8164994,
+    "name": "La Gas",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.6553105,
+    "lon": -91.8167716,
+    "name": "Orsan",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.6609814,
+    "lon": -91.818124,
+    "name": "Farmacias del Ahorro",
+    "type": "pharmacy"
+  },
+  {
+    "lat": 18.6316301,
+    "lon": -91.825172,
+    "name": "Pemex",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.6656423,
+    "lon": -91.7575152,
+    "name": "Pemex",
+    "type": "fuel"
+  },
+  {
+    "lat": 18.6446529,
+    "lon": -91.7840078,
+    "name": "Bimbi disfraces",
+    "type": "clothes"
+  },
+  {
+    "lat": 18.637856,
+    "lon": -91.8220511,
+    "name": "Oxxo",
+    "type": "convenience"
+  },
+  {
+    "lat": 18.656756,
+    "lon": -91.791089,
+    "name": "Boston's Pizza",
+    "type": "pub"
+  },
+  {
+    "lat": 18.6580917,
+    "lon": -91.8152564,
+    "name": "Home Office",
+    "type": "stationery"
+  },
+  {
+    "lat": 18.6388753,
+    "lon": -91.835419,
+    "name": "Picadísimas",
+    "type": "restaurant"
+  },
+  {
+    "lat": 18.6511983,
+    "lon": -91.8026537,
+    "name": "Hertz",
+    "type": "car_rental"
+  },
+  {
+    "lat": 18.6548654,
+    "lon": -91.808525,
+    "name": "Suburbia",
+    "type": "clothes"
+  },
+  {
+    "lat": 18.6371977,
+    "lon": -91.8370773,
+    "name": "Letras CARMEN",
+    "type": "attraction"
+  },
+  {
+    "lat": 18.6358606,
+    "lon": -91.8363734,
+    "name": "Terminal Turística Isla del Carmen",
+    "type": "ferry_terminal"
+  },
+  {
+    "lat": 18.6641845,
+    "lon": -91.8257628,
+    "name": "Nelsón Barrera Romellón \"El Almirante\"",
+    "type": "artwork"
+  },
+  {
+    "lat": 18.6646222,
+    "lon": -91.8254751,
+    "name": "Barras Calistenia Playa Norte",
+    "type": "fitness_station"
+  },
+  {
+    "lat": 18.6624229,
+    "lon": -91.8333461,
+    "name": "Caballito de Mar",
+    "type": "artwork"
+  },
+  {
+    "lat": 18.6507996,
+    "lon": -91.8121591,
+    "name": "Soriana Super",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.648862,
+    "lon": -91.830079,
+    "name": "LOCAL COMERCIAL",
+    "type": "supermarket"
+  },
+  {
+    "lat": 18.6474794,
+    "lon": -91.832159,
+    "name": "TEMPLO",
+    "type": "place_of_worship"
+  },
+  {
+    "lat": 18.6481212,
+    "lon": -91.8282092,
+    "name": "SUPERMERCADO",
+    "type": "yes"
+  },
+  {
+    "lat": 18.6465195,
+    "lon": -91.8203936,
+    "name": "HOSPITAL",
+    "type": "hospital"
+  },
+  {
+    "lat": 18.6484659,
+    "lon": -91.8392179,
+    "name": "BANAMEX",
+    "type": "bank"
+  },
+  {
+    "lat": 18.6519645,
+    "lon": -91.8397504,
+    "name": "CENTRO DEPORTIVO",
+    "type": "sports_centre"
+  },
+  {
+    "lat": 18.6533061,
+    "lon": -91.8283872,
+    "name": "CANCHA",
+    "type": "pitch"
+  },
+  {
+    "lat": 18.6536543,
+    "lon": -91.8277756,
+    "name": "PARQUE",
+    "type": "park"
+  },
+  {
+    "lat": 18.6536645,
+    "lon": -91.8280868,
+    "name": "JARDIN",
+    "type": "garden"
+  },
+  {
+    "lat": 18.6562799,
+    "lon": -91.8292453,
+    "name": "CLINICA",
+    "type": "doctors"
+  },
+  {
+    "lat": 18.6570673,
+    "lon": -91.8284271,
+    "name": "MERCADO",
+    "type": "marketplace"
+  },
+  {
+    "lat": 18.6548415,
+    "lon": -91.8334752,
+    "name": "UNIVERSIDAD",
+    "type": "university"
+  }
+]
