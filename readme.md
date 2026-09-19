@@ -23,8 +23,9 @@ Vite mostrará en la terminal la URL local de desarrollo (normalmente
 ## Estructura principal
 
 - `src/main.tsx`: punto de entrada de React.
-- `src/App.tsx`: componente principal de la aplicación.
-- `src/index.css` y `src/App.css`: estilos globales y de la pantalla inicial.
+- `src/App.tsx`: arma el layout (barra superior, mapa y panel de incidentes).
+- `src/components/`: `TopBar`, `MapPlaceholder` e `IncidentPanel`.
+- `src/styles.css`: estilos globales y del layout.
 - `vite.config.ts`: configuración de Vite y el plugin de React.
 - `tsconfig*.json`: configuración de TypeScript para navegador y herramientas.
 
