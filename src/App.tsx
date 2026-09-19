@@ -1,5 +1,5 @@
 import { IncidentPanel } from './components/IncidentPanel'
-import { MapPlaceholder } from './components/MapPlaceholder'
+import { MapView } from './components/MapView'
 import { TopBar } from './components/TopBar'
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
     <main className="app-frame">
       <TopBar />
       <div className="dashboard">
-        <MapPlaceholder />
+        <MapView />
         <IncidentPanel />
       </div>
     </main>

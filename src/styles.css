@@ -125,21 +125,47 @@ button:focus-visible {
   min-height: calc(100vh - 99px);
 }
 
-.map-placeholder {
+.map-view {
   position: relative;
-  display: grid;
-  place-items: center;
+  isolation: isolate;
   min-height: 700px;
-  overflow: hidden;
-  color: #959590;
   background: #f5f6f5;
 }
 
-.map-placeholder span {
-  padding: 10px 16px;
-  border: 1px dashed #ccccc7;
-  border-radius: 10px;
-  font-size: 0.9rem;
+.map-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.map-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 14px;
+  color: #55534f;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.map-hint svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+@media (hover: none) {
+  .map-hint { display: none; }
 }
 
 .incident-panel {
@@ -243,7 +269,7 @@ button:focus-visible {
   .top-bar { padding: 0 18px; }
   .brand span, .summary { display: none; }
   .dashboard { grid-template-columns: 1fr; }
-  .map-placeholder { min-height: 56vh; }
+  .map-view { min-height: 56vh; }
   .incident-panel { border-top: 1px solid #e2e2df; border-left: 0; }
 }
 
@@ -254,6 +280,7 @@ button:focus-visible {
   .brand strong { font-size: 1.1rem; }
   .report-button { height: 44px; padding: 0 14px; font-size: 1rem; }
   .more-button { display: none; }
-  .map-placeholder { min-height: 430px; }
+  .map-view { min-height: 430px; }
+  .map-hint { display: none; }
   .incident-panel { padding: 18px 14px 30px; }
 }
