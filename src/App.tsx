@@ -1,45 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Bell } from 'lucide-react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import MapView from './components/MapView';
+import type { Report } from './components/MapView';
 
-// Fix for default Leaflet icons in React
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Mock data generation or hardcoded data
+const MOCK_REPORTS: Report[] = [
+  { id: '1', lat: 18.6351953, lng: -91.8331322, title: 'Incendio en Iglesia', category: 'fire' },
+  { id: '2', lat: 18.6314642, lng: -91.829715, title: 'Robo cerca del Guanal', category: 'police' },
+  { id: '3', lat: 18.6479308, lng: -91.8148958, title: 'Accidente de tráfico', category: 'traffic' },
+  { id: '4', lat: 18.6400702, lng: -91.8385731, title: 'Emergencia médica Mercado', category: 'medical' },
+  { id: '5', lat: 18.6405785, lng: -91.8389165, title: 'Disturbio en La Campesina', category: 'police' },
+  { id: '6', lat: 18.6384447, lng: -91.8345226, title: 'Vehículo averiado', category: 'traffic' },
+  { id: '7', lat: 18.6450893, lng: -91.8182704, title: 'Incendio en Glorieta', category: 'fire' },
+];
 
 function App() {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<L.Map | null>(null);
+  const [reports] = useState<Report[]>(MOCK_REPORTS);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!mapRef.current) return;
-    if (map) return; // Map already initialized
-
-    // Center approx on Ciudad del Carmen
-    const leafletMap = L.map(mapRef.current, {
-      zoomControl: false, // We'll add it custom or use default position
-      maxZoom: 19 // World Street Map supports deep zoom
-    }).setView([18.648, -91.790], 14);
-
-    // Using Esri World Street Map for a colorful, standard map palette
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
-      maxZoom: 19
-    }).addTo(leafletMap);
-
-    // Add zoom control to top right
-    L.control.zoom({ position: 'topright' }).addTo(leafletMap);
-
-    setMap(leafletMap);
-
-    return () => {
-      leafletMap.remove();
-    };
-  }, []);
+  // You can also add filtering state if requested (visible reports), but for now we just pass reports
+  const visibleReports = reports;
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-white text-slate-900 font-sans">
@@ -54,13 +34,42 @@ function App() {
 
       {/* Main Content */}
       <main className="flex flex-1 overflow-hidden">
+        
+        {/* Sidebar Panel */}
+        <aside className="w-80 bg-slate-50 border-r border-slate-200 overflow-y-auto flex flex-col z-10">
+          <div className="p-4 border-b border-slate-200">
+            <h2 className="font-semibold">Incidentes Recientes</h2>
+            <p className="text-sm text-slate-500">Selecciona un incidente para verlo en el mapa</p>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2">
+            {visibleReports.map((report) => (
+              <div 
+                key={report.id}
+                onClick={() => setSelectedId(report.id)}
+                className={`p-3 mb-2 rounded cursor-pointer border ${
+                  selectedId === report.id 
+                    ? 'bg-blue-50 border-blue-200 shadow-sm' 
+                    : 'bg-white border-slate-100 hover:bg-slate-50'
+                }`}
+              >
+                <div className="font-medium">{report.title}</div>
+                <div className="text-xs text-slate-500 uppercase mt-1">{report.category}</div>
+              </div>
+            ))}
+          </div>
+        </aside>
+
         {/* Map Area */}
         <div className="flex-1 relative">
-          <div ref={mapRef} className="absolute inset-0 z-0" />
+          <MapView 
+            reports={visibleReports}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+          />
           
           {/* Map Overlay Controls */}
           <div className="absolute bottom-4 left-4 z-[400] bg-white px-3 py-2 rounded-lg shadow-sm border border-slate-200 flex items-center gap-2 text-sm text-slate-600">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3 3-3M2 12h20M12 2v20"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3-3 3M2 12h20M12 2v20"/></svg>
             WASD para mover · rueda para zoom
           </div>
         </div>

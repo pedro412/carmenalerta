@@ -40,3 +40,40 @@ body {
   background-color: rgba(239, 68, 68, 0.4);
   animation: pulse-ring 2s infinite ease-out;
 }
+
+/* Marker styles */
+.incident-marker {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.incident-marker.selected {
+  border-width: 3px;
+  z-index: 1000 !important;
+}
+
+.pulse-ring {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  animation: marker-pulse 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  box-sizing: border-box;
+}
+
+@keyframes marker-pulse {
+  0% { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+.custom-div-icon {
+  background: none;
+  border: none;
+}
