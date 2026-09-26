@@ -55,3 +55,21 @@ OpenStreetMap): [Plaza Real](https://www.openstreetmap.org/way/224513587),
 Al cambiar los reportes de ejemplo, el panel y los contadores se actualizan
 desde el mismo estado de `App.tsx`. Los chips existentes muestran solo reportes
 activos; la categoría «Otro» aparece únicamente al elegir «Todos».
+
+## Crear reportes
+
+El botón **Reportar** abre un formulario con categoría, descripción de hasta
+140 caracteres, severidad y ubicación. La severidad es obligatoria según
+`requiresSeverity`; si es opcional y se omite, se guarda como `low`.
+La ubicación se obtiene mediante GPS (con permiso del navegador) o seleccionando
+un punto del mapa. Con teclado, mueve el mapa con flechas/WASD y pulsa Enter
+para seleccionar su centro. Escape permite volver al formulario desde el mapa
+o cerrar el modal. Los campos se conservan durante la selección de ubicación.
+
+Los reportes se agregan al estado de `App`, con fecha actual y estado
+`unverified`, se muestran en Todos y quedan seleccionados. Se pierden al
+recargar la página. No se incluyen archivos multimedia ni persistencia.
+
+Integración de `MapView`: `pickingLocation` activa el selector;
+`onMapClick({ latitude, longitude })` entrega el punto seleccionado y
+`onCancelLocation()` vuelve al formulario. Estas propiedades son opcionales.

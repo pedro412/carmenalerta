@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import type { Category, Report } from '../types'
+import type { Category, Report, ReportLocation } from '../types'
 
 const CIUDAD_DEL_CARMEN: L.LatLngTuple = [18.648, -91.79]
 const PAN_OFFSET = 80
@@ -44,9 +44,12 @@ export type MapViewProps = {
   categories: Category[]
   selectedId: string | null
   onSelectReport: (id: string) => void
+  pickingLocation?: boolean
+  onMapClick?: (location: ReportLocation) => void
+  onCancelLocation?: () => void
 }
 
-export function MapView({ reports, categories, selectedId, onSelectReport }: MapViewProps) {
+export function MapView({ reports, categories, selectedId, onSelectReport, pickingLocation = false, onMapClick, onCancelLocation }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -98,20 +101,67 @@ export function MapView({ reports, categories, selectedId, onSelectReport }: Map
     reports.forEach((report) => {
       const color = colorById.get(report.categoryId) ?? DEFAULT_MARKER_COLOR
       L.marker([report.latitude, report.longitude], { icon: markerIcon(color, report.id === selectedId) })
-        .on('click', () => onSelectReport(report.id))
+        .on('click', () => {
+          if (pickingLocation) onMapClick?.({ latitude: report.latitude, longitude: report.longitude })
+          else onSelectReport(report.id)
+        })
         .addTo(cluster)
     })
-  }, [reports, categories, selectedId, onSelectReport])
+  }, [reports, categories, selectedId, onSelectReport, pickingLocation, onMapClick])
 
   useEffect(() => {
-    if (selectedReport) {
-      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 16, { duration: 1.5 })
+    if (selectedReport && !pickingLocation) {
+      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 18, { duration: 1.5 })
     }
-  }, [selectedReport?.latitude, selectedReport?.longitude])
+  }, [selectedReport?.latitude, selectedReport?.longitude, pickingLocation])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !pickingLocation) return
+    map.stop()
+    const container = map.getContainer()
+    const choose = (point: L.LatLng) => onMapClick?.({ latitude: point.lat, longitude: point.lng })
+    const click = (event: L.LeafletMouseEvent) => choose(event.latlng)
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && event.target === container) {
+        event.preventDefault()
+        choose(map.getCenter())
+      }
+    }
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); onCancelLocation?.() }
+    }
+    map.on('click', click)
+    container.addEventListener('keydown', keydown)
+    document.addEventListener('keydown', escape)
+    const frame = requestAnimationFrame(() => {
+      container.scrollIntoView({ block: 'center' })
+      container.focus({ preventScroll: true })
+      map.invalidateSize()
+    })
+    return () => {
+      cancelAnimationFrame(frame)
+      map.off('click', click)
+      container.removeEventListener('keydown', keydown)
+      document.removeEventListener('keydown', escape)
+    }
+  }, [pickingLocation, onMapClick, onCancelLocation])
 
   return (
-    <section className="map-view" aria-label={`Mapa de incidentes: ${reports.length} visibles`}>
-      <div className="map-canvas" ref={containerRef} />
+    <section className={pickingLocation ? 'map-view is-picking' : 'map-view'} aria-label={`Mapa de incidentes: ${reports.length} visibles`}>
+      <div className="map-canvas" ref={containerRef} tabIndex={0}
+        aria-label="Mapa de incidentes" aria-describedby={pickingLocation ? 'map-pick-help' : undefined} />
+      {pickingLocation && <>
+        <span className="map-crosshair" aria-hidden="true">＋</span>
+        <div className="map-pick-controls">
+          <p id="map-pick-help" role="status">Toca un punto del mapa. Con teclado: mueve con las flechas o WASD y pulsa Enter para elegir el centro.</p>
+          <button type="button" onClick={() => {
+            const point = mapRef.current?.getCenter()
+            if (point) onMapClick?.({ latitude: point.lat, longitude: point.lng })
+          }}>Usar el centro del mapa</button>
+          <button type="button" onClick={onCancelLocation}>Volver al formulario</button>
+        </div>
+      </>}
       <p className="map-hint">
         <MoveIcon />
         WASD para mover · rueda para zoom
