@@ -1,113 +1,121 @@
-import { useEffect, useRef } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.markercluster';
-import 'leaflet.markercluster/dist/MarkerCluster.css';
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import { useEffect, useRef } from 'react'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
+import type { Category, Report } from '../types'
 
-export interface Report {
-  id: string;
-  lat: number;
-  lng: number;
-  title: string;
-  category: string;
+const CIUDAD_DEL_CARMEN: L.LatLngTuple = [18.648, -91.79]
+const PAN_OFFSET = 80
+const DEFAULT_MARKER_COLOR = '#6b7280'
+
+// Leaflet solo trae navegación con flechas; el diseño pide WASD.
+const wasdPan: Record<string, L.PointTuple> = {
+  w: [0, -PAN_OFFSET],
+  a: [-PAN_OFFSET, 0],
+  s: [0, PAN_OFFSET],
+  d: [PAN_OFFSET, 0],
 }
 
-interface MapViewProps {
-  reports: Report[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
+function MoveIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M19 9l3 3-3 3M9 19l3 3 3-3M2 12h20M12 2v20" />
+    </svg>
+  )
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  fire: '#ef4444',     // red
-  police: '#3b82f6',   // blue
-  medical: '#10b981',  // green
-  traffic: '#f59e0b',  // amber
-  default: '#6b7280',  // gray
-};
+function markerIcon(color: string, isSelected: boolean) {
+  return L.divIcon({
+    html: `
+      <div class="incident-marker ${isSelected ? 'selected' : ''}" style="background-color: ${color};">
+        ${isSelected ? `<div class="marker-pulse-ring" style="border-color: ${color};"></div>` : ''}
+      </div>
+    `,
+    className: 'custom-div-icon',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  })
+}
 
-export default function MapView({ reports, selectedId, onSelect }: MapViewProps) {
-  const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstance = useRef<L.Map | null>(null);
-  const markerClusterGroup = useRef<L.MarkerClusterGroup | null>(null);
-  const markersRef = useRef<Record<string, L.Marker>>({});
+export type MapViewProps = {
+  reports: Report[]
+  categories: Category[]
+  selectedId: string | null
+  onSelectReport: (id: string) => void
+}
+
+export function MapView({ reports, categories, selectedId, onSelectReport }: MapViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<L.Map | null>(null)
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
+  const selectedReport = reports.find((report) => report.id === selectedId)
 
   useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return;
+    if (!containerRef.current) return
 
-    // Create map once
-    const map = L.map(mapRef.current, {
+    const map = L.map(containerRef.current, {
       zoomControl: false,
-      maxZoom: 19
-    }).setView([18.648, -91.790], 14);
+      maxZoom: 19,
+    }).setView(CIUDAD_DEL_CARMEN, 14)
+    mapRef.current = map
 
-    // Using OpenStreetMap instead of Esri per requirement
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19
-    }).addTo(map);
+      maxZoom: 19,
+    }).addTo(map)
 
-    L.control.zoom({ position: 'topright' }).addTo(map);
+    L.control.zoom({ position: 'topright' }).addTo(map)
 
-    mapInstance.current = map;
-    markerClusterGroup.current = L.markerClusterGroup({
-      // Configure markercluster to not cluster at high zoom levels if we want
-      disableClusteringAtZoom: 18,
-    });
-    map.addLayer(markerClusterGroup.current);
+    const cluster = L.markerClusterGroup({ disableClusteringAtZoom: 18 })
+    map.addLayer(cluster)
+    clusterRef.current = cluster
+
+    const container = map.getContainer()
+    const onKeyDown = (event: KeyboardEvent) => {
+      const offset = wasdPan[event.key.toLowerCase()]
+      if (!offset || event.altKey || event.ctrlKey || event.metaKey) return
+      event.preventDefault()
+      map.panBy(offset)
+    }
+    container.addEventListener('keydown', onKeyDown)
 
     return () => {
-      map.remove();
-      mapInstance.current = null;
-    };
-  }, []);
-
-  // Effect to update markers when reports or selectedId change
-  useEffect(() => {
-    if (!mapInstance.current || !markerClusterGroup.current) return;
-
-    const clusterGroup = markerClusterGroup.current;
-    clusterGroup.clearLayers();
-    markersRef.current = {};
-
-    reports.forEach((report) => {
-      const color = CATEGORY_COLORS[report.category] || CATEGORY_COLORS.default;
-      const isSelected = report.id === selectedId;
-      
-      const html = `
-        <div class="incident-marker ${isSelected ? 'selected' : ''}" style="background-color: ${color};">
-          ${isSelected ? `<div class="pulse-ring" style="border-color: ${color};"></div>` : ''}
-        </div>
-      `;
-
-      const icon = L.divIcon({
-        html,
-        className: 'custom-div-icon',
-        iconSize: [24, 24],
-        iconAnchor: [12, 12]
-      });
-
-      const marker = L.marker([report.lat, report.lng], { icon })
-        .on('click', () => {
-          onSelect(report.id);
-        });
-
-      markersRef.current[report.id] = marker;
-      clusterGroup.addLayer(marker);
-    });
-  }, [reports, selectedId, onSelect]);
-
-  // Effect to fly to selected marker
-  useEffect(() => {
-    if (selectedId && mapInstance.current && markersRef.current[selectedId]) {
-      const marker = markersRef.current[selectedId];
-      const latLng = marker.getLatLng();
-      mapInstance.current.flyTo(latLng, 16, {
-        duration: 1.5
-      });
+      container.removeEventListener('keydown', onKeyDown)
+      map.remove()
+      mapRef.current = null
+      clusterRef.current = null
     }
-  }, [selectedId]);
+  }, [])
 
-  return <div ref={mapRef} className="absolute inset-0 z-0" />;
+  useEffect(() => {
+    const cluster = clusterRef.current
+    if (!cluster) return
+
+    const colorById = new Map(categories.map((category) => [category.id, category.color]))
+    cluster.clearLayers()
+    reports.forEach((report) => {
+      const color = colorById.get(report.categoryId) ?? DEFAULT_MARKER_COLOR
+      L.marker([report.latitude, report.longitude], { icon: markerIcon(color, report.id === selectedId) })
+        .on('click', () => onSelectReport(report.id))
+        .addTo(cluster)
+    })
+  }, [reports, categories, selectedId, onSelectReport])
+
+  useEffect(() => {
+    if (selectedReport) {
+      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 16, { duration: 1.5 })
+    }
+  }, [selectedReport?.latitude, selectedReport?.longitude])
+
+  return (
+    <section className="map-view" aria-label={`Mapa de incidentes: ${reports.length} visibles`}>
+      <div className="map-canvas" ref={containerRef} />
+      <p className="map-hint">
+        <MoveIcon />
+        WASD para mover · rueda para zoom
+      </p>
+    </section>
+  )
 }
