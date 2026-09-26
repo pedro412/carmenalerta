@@ -9,9 +9,9 @@ function BellIcon() {
   )
 }
 
-type TopBarProps = { reports: Report[] }
+type TopBarProps = { reports: Report[]; onReport: () => void }
 
-export function TopBar({ reports }: TopBarProps) {
+export function TopBar({ reports, onReport }: TopBarProps) {
   const activeReports = reports.filter(isActiveReport)
   const criticalCount = activeReports.filter((report) => report.severity === 'high').length
 
@@ -26,7 +26,7 @@ export function TopBar({ reports }: TopBarProps) {
       <div className="top-actions">
         <span className="summary summary--critical">{criticalCount} críticos</span>
         <span className="summary">{activeReports.length} activos</span>
-        <button className="report-button" type="button">
+        <button className="report-button" type="button" onClick={onReport} aria-haspopup="dialog">
           <span aria-hidden="true">＋</span>
           Reportar
         </button>

@@ -26,3 +26,5 @@ export type Report = {
   status: ReportStatus
   createdAt: string
 }
+
+export type ReportLocation = { latitude: number; longitude: number }
