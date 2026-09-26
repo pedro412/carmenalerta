@@ -1,10 +1,14 @@
 import { useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet.markercluster'
+import 'leaflet.markercluster/dist/MarkerCluster.css'
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import type { Category, Report } from '../types'
 
 const CIUDAD_DEL_CARMEN: L.LatLngTuple = [18.648, -91.79]
 const PAN_OFFSET = 80
+const DEFAULT_MARKER_COLOR = '#6b7280'
 
 // Leaflet solo trae navegación con flechas; el diseño pide WASD.
 const wasdPan: Record<string, L.PointTuple> = {
@@ -22,17 +26,30 @@ function MoveIcon() {
   )
 }
 
+function markerIcon(color: string, isSelected: boolean) {
+  return L.divIcon({
+    html: `
+      <div class="incident-marker ${isSelected ? 'selected' : ''}" style="background-color: ${color};">
+        ${isSelected ? `<div class="marker-pulse-ring" style="border-color: ${color};"></div>` : ''}
+      </div>
+    `,
+    className: 'custom-div-icon',
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  })
+}
+
 export type MapViewProps = {
   reports: Report[]
-  // Daniel puede usar categorías y callback al implementar los marcadores.
   categories: Category[]
   selectedId: string | null
   onSelectReport: (id: string) => void
 }
 
-export function MapView({ reports, selectedId }: MapViewProps) {
+export function MapView({ reports, categories, selectedId, onSelectReport }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
   const selectedReport = reports.find((report) => report.id === selectedId)
 
   useEffect(() => {
@@ -44,16 +61,16 @@ export function MapView({ reports, selectedId }: MapViewProps) {
     }).setView(CIUDAD_DEL_CARMEN, 14)
     mapRef.current = map
 
-    L.tileLayer(
-      'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-      {
-        attribution:
-          'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
-        maxZoom: 19,
-      },
-    ).addTo(map)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map)
 
     L.control.zoom({ position: 'topright' }).addTo(map)
+
+    const cluster = L.markerClusterGroup({ disableClusteringAtZoom: 18 })
+    map.addLayer(cluster)
+    clusterRef.current = cluster
 
     const container = map.getContainer()
     const onKeyDown = (event: KeyboardEvent) => {
@@ -68,11 +85,28 @@ export function MapView({ reports, selectedId }: MapViewProps) {
       container.removeEventListener('keydown', onKeyDown)
       map.remove()
       mapRef.current = null
+      clusterRef.current = null
     }
   }, [])
 
   useEffect(() => {
-    if (selectedReport) mapRef.current?.panTo([selectedReport.latitude, selectedReport.longitude])
+    const cluster = clusterRef.current
+    if (!cluster) return
+
+    const colorById = new Map(categories.map((category) => [category.id, category.color]))
+    cluster.clearLayers()
+    reports.forEach((report) => {
+      const color = colorById.get(report.categoryId) ?? DEFAULT_MARKER_COLOR
+      L.marker([report.latitude, report.longitude], { icon: markerIcon(color, report.id === selectedId) })
+        .on('click', () => onSelectReport(report.id))
+        .addTo(cluster)
+    })
+  }, [reports, categories, selectedId, onSelectReport])
+
+  useEffect(() => {
+    if (selectedReport) {
+      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 16, { duration: 1.5 })
+    }
   }, [selectedReport?.latitude, selectedReport?.longitude])
 
   return (
