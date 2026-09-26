@@ -123,7 +123,7 @@ function App() {
         </div>
       )}
 
-      <TopBar reports={reports} />
+      <TopBar />
       <div className="dashboard">
         <MapView
           reports={visibleReports}
