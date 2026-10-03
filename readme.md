@@ -19,6 +19,7 @@ Vite mostrará en la terminal la URL local de desarrollo (normalmente
 - `npm run dev`: inicia el servidor de desarrollo con recarga rápida.
 - `npm run build`: valida TypeScript y genera la versión de producción en `dist/`.
 - `npm run preview`: sirve localmente la compilación de producción.
+- `npm test`: ejecuta las pruebas del proyecto (con vitest).
 
 ## Estructura principal
 
