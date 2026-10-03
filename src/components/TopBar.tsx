@@ -1,6 +1,3 @@
-import { isActiveReport } from '../data/filters'
-import type { Report } from '../types'
-
 function BellIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -9,11 +6,7 @@ function BellIcon() {
   )
 }
 
-type TopBarProps = { reports: Report[] }
-
-export function TopBar({ reports }: TopBarProps) {
-  const activeReports = reports.filter(isActiveReport)
-  const criticalCount = activeReports.filter((report) => report.severity === 'high').length
+export function TopBar() {
 
   return (
     <header className="top-bar">
@@ -24,15 +17,7 @@ export function TopBar({ reports }: TopBarProps) {
       </div>
 
       <div className="top-actions">
-        <span className="summary summary--critical">{criticalCount} críticos</span>
-        <span className="summary">{activeReports.length} activos</span>
-        <button className="report-button" type="button">
-          <span aria-hidden="true">＋</span>
-          Reportar
-        </button>
-        <button className="more-button" type="button" aria-label="Más opciones">
-          •••
-        </button>
+        {/* Actions removed as requested */}
       </div>
     </header>
   )
