@@ -25,13 +25,21 @@ function App() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, accuracy: number} | null>(null)
   const [geoError, setGeoError] = useState<string | null>(null)
   const [alertsEnabled, setAlertsEnabled] = useState(() => {
-    return localStorage.getItem('alertsEnabled') !== 'false'
+    try {
+      return localStorage.getItem('alertsEnabled') !== 'false'
+    } catch {
+      return true
+    }
   })
   const [showRadius, setShowRadius] = useState(false)
   const [newAlert, setNewAlert] = useState<{report: Report, distance: number} | null>(null)
 
   useEffect(() => {
-    localStorage.setItem('alertsEnabled', alertsEnabled.toString())
+    try {
+      localStorage.setItem('alertsEnabled', String(alertsEnabled))
+    } catch {
+      // storage no disponible; se ignora
+    }
   }, [alertsEnabled])
 
   useEffect(() => {
