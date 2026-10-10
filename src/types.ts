@@ -18,6 +18,7 @@ export type Category = {
 export type Report = {
   id: string
   categoryId: Category['id']
+  reporterId: User['id']
   latitude: number
   longitude: number
   description: string
@@ -25,4 +26,20 @@ export type Report = {
   severity: Severity
   status: ReportStatus
   createdAt: string
+}
+
+export type VoteType = 'confirm' | 'resolved'
+
+export type ReportVote = {
+  reportId: Report['id']
+  userId: User['id']
+  voteType: VoteType
+  createdAt: string
+}
+
+export type User = {
+  id: string
+  username: string
+  /** Texto temporal hasta que #10 aporte el componente de insignia. */
+  badgeLabel: string
 }

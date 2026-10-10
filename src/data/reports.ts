@@ -9,6 +9,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-1',
     categoryId: 'flood',
+    reporterId: 'user-ana',
     latitude: 18.65075,
     longitude: -91.81237,
     description: 'Encharcamiento fuerte',
@@ -20,6 +21,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-2',
     categoryId: 'accident',
+    reporterId: 'user-carlos',
     latitude: 18.630331,
     longitude: -91.825908,
     description: 'Choque, un carril cerrado',
@@ -31,6 +33,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-3',
     categoryId: 'power',
+    reporterId: 'user-diego',
     latitude: 18.66254,
     longitude: -91.83141,
     description: 'Sin luz desde las 6',
@@ -42,6 +45,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-4',
     categoryId: 'funeral',
+    reporterId: 'user-elena',
     latitude: 18.64007,
     longitude: -91.83857,
     description: 'Cierre temporal de calle',
@@ -53,6 +57,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-5',
     categoryId: 'other',
+    reporterId: 'user-javier',
     latitude: 18.66166,
     longitude: -91.83934,
     description: 'Poste dañado',
@@ -64,6 +69,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-6',
     categoryId: 'traffic-light',
+    reporterId: 'user-sofia',
     latitude: 18.64754,
     longitude: -91.81952,
     description: 'Semáforo sin funcionar',
@@ -75,6 +81,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-7',
     categoryId: 'construction',
+    reporterId: 'user-carlos',
     latitude: 18.66037,
     longitude: -91.83314,
     description: 'Obras en la vialidad',
@@ -86,6 +93,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-8',
     categoryId: 'flood',
+    reporterId: 'user-lucia',
     latitude: 18.65707,
     longitude: -91.82843,
     description: 'Agua acumulada en la vía',
@@ -97,6 +105,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-9',
     categoryId: 'accident',
+    reporterId: 'user-ana',
     latitude: 18.64633,
     longitude: -91.82069,
     description: 'Choque despejado',
@@ -108,6 +117,7 @@ export const initialReports: Report[] = [
   {
     id: 'report-10',
     categoryId: 'power',
+    reporterId: 'user-elena',
     latitude: 18.66256,
     longitude: -91.83062,
     description: 'Servicio eléctrico restablecido',
