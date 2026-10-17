@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import type { Category, Report } from '../types'
+import type { Category, Report, ReportLocation } from '../types'
 
 const CIUDAD_DEL_CARMEN: L.LatLngTuple = [18.648, -91.79]
 const PAN_OFFSET = 80
@@ -44,9 +44,11 @@ export type MapViewProps = {
   categories: Category[]
   selectedId: string | null
   onSelectReport: (id: string) => void
+  onSelectLocation?: (location: ReportLocation) => void
+  selectedLocation?: ReportLocation | null
 }
 
-export function MapView({ reports, categories, selectedId, onSelectReport }: MapViewProps) {
+export function MapView({ reports, categories, selectedId, onSelectReport, onSelectLocation, selectedLocation }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -90,6 +92,34 @@ export function MapView({ reports, categories, selectedId, onSelectReport }: Map
   }, [])
 
   useEffect(() => {
+    const map = mapRef.current
+    if (!map || !onSelectLocation) return
+    const selectPoint = (event: L.LeafletMouseEvent) => {
+      const point = event.latlng.wrap()
+      onSelectLocation({ latitude: point.lat, longitude: point.lng })
+    }
+    map.on('click', selectPoint)
+    return () => { map.off('click', selectPoint) }
+  }, [onSelectLocation])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !selectedLocation) return
+    const point: L.LatLngTuple = [selectedLocation.latitude, selectedLocation.longitude]
+    const marker = L.marker(point, {
+      icon: L.divIcon({
+        className: 'location-pin',
+        html: '<span aria-hidden="true"></span>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+      }),
+      keyboard: false,
+    }).addTo(map)
+    if (!map.getBounds().contains(point)) map.setView(point, 16)
+    return () => { marker.remove() }
+  }, [selectedLocation])
+
+  useEffect(() => {
     const cluster = clusterRef.current
     if (!cluster) return
 
@@ -110,12 +140,19 @@ export function MapView({ reports, categories, selectedId, onSelectReport }: Map
   }, [selectedReport?.latitude, selectedReport?.longitude])
 
   return (
-    <section className="map-view" aria-label={`Mapa de incidentes: ${reports.length} visibles`}>
+    <section className={onSelectLocation ? 'map-view map-view--picker' : 'map-view'} aria-label={onSelectLocation ? 'Seleccionar ubicación del reporte' : `Mapa de incidentes: ${reports.length} visibles`}>
       <div className="map-canvas" ref={containerRef} />
-      <p className="map-hint">
+      {onSelectLocation && <>
+        <span className="map-center-crosshair" aria-hidden="true">＋</span>
+        <button className="map-center-button" type="button" onClick={() => {
+          const center = mapRef.current?.getCenter().wrap()
+          if (center) onSelectLocation({ latitude: center.lat, longitude: center.lng })
+        }}>Usar el centro del mapa</button>
+      </>}
+      {!onSelectLocation && <p className="map-hint">
         <MoveIcon />
         WASD para mover · rueda para zoom
-      </p>
+      </p>}
     </section>
   )
 }

@@ -47,6 +47,7 @@ export function IncidentPanel({
             <span className="incident-copy">
               <strong>{report.description}</strong>
               <span>{report.location}</span>
+              <span className="incident-status">{report.status === 'unverified' ? 'Sin verificar' : 'Verificado'}</span>
             </span>
             <time dateTime={report.createdAt}>{formatReportAge(report.createdAt, now)}</time>
           </button>

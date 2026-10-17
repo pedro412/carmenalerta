@@ -26,3 +26,7 @@ export type Report = {
   status: ReportStatus
   createdAt: string
 }
+
+export type ReportDraft = Omit<Report, 'id' | 'status' | 'createdAt'>
+
+export type ReportLocation = Pick<Report, 'latitude' | 'longitude'>

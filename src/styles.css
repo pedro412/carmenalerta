@@ -23,6 +23,18 @@ button:focus-visible {
 
 #root { min-height: 100vh; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app-frame {
   width: calc(100% - 20px);
   min-height: calc(100vh - 8px);
@@ -106,9 +118,41 @@ button:focus-visible {
   padding: 0 24px;
   border-radius: 16px;
   font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease,
+    border-color 180ms ease, box-shadow 180ms ease;
 }
 
-.report-button span { font-size: 2rem; font-weight: 300; }
+.report-button-icon {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 300;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .report-button:hover {
+    transform: translateY(-2px);
+    background-color: #edf6ff;
+    border-color: #74b3f6;
+    box-shadow: 0 5px 12px rgba(21, 86, 151, 0.16);
+  }
+
+  .report-button:hover .report-button-icon { transform: rotate(90deg); }
+}
+
+.report-button:active {
+  background-color: #d4e8ff;
+  border-color: #74b3f6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-button,
+  .report-button-icon { transition: none; }
+
+  .report-button:hover,
+  .report-button:hover .report-button-icon { transform: none; }
+}
 
 .more-button {
   width: 50px;
@@ -286,6 +330,8 @@ button:focus-visible {
 
 .incident.is-selected .incident-copy > span { color: #1f65a8; }
 
+.incident-copy > .incident-status { width: fit-content; padding: 3px 8px; color: #595752; background: #f5f6f5; border-radius: 8px; font-size: 0.8rem; }
+
 .incident time {
   color: #898780;
   font-size: 1rem;
@@ -300,6 +346,95 @@ button:focus-visible {
   text-align: center;
 }
 
+.report-dialog {
+  width: min(600px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  padding: 28px;
+  color: #171716;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.report-dialog::backdrop { background: rgba(17, 30, 44, 0.5); }
+.report-form-header { display: flex; align-items: flex-start; gap: 16px; }
+.report-form-header h2 { margin: 0; font-size: 1.5rem; }
+.report-form-header p { margin: 8px 0 24px; color: #595752; line-height: 1.5; }
+.report-close {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #595752;
+  background: #f5f6f5;
+  border: 0;
+  border-radius: 12px;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+.report-form { display: grid; gap: 22px; }
+.report-field { display: grid; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.report-field > label, .report-field legend { padding: 0; font-weight: 600; }
+.report-field legend { margin-bottom: 10px; }
+.report-field select, .report-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px;
+  color: #171716;
+  background: #fff;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 1rem;
+}
+.report-field textarea { resize: vertical; }
+.report-field select:focus-visible, .report-field textarea:focus-visible,
+.report-field input:focus-visible { outline: 3px solid #74b3f6; outline-offset: 2px; }
+.report-field [aria-invalid="true"] { border-color: #a92d29; }
+.report-character-count { color: #595752; text-align: right; font-size: 0.85rem; }
+.report-severity-options, .report-location-actions, .report-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.report-severity-options label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.report-severity-options label:has(input:checked) { color: #104d86; background: #edf6ff; border-color: #74b3f6; }
+.report-severity-options input { margin: 0; accent-color: #155697; }
+.report-secondary, .report-submit, .map-center-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.report-secondary, .map-center-button { color: #155697; background: #fff; }
+.report-secondary:hover, .map-center-button:hover { background: #edf6ff; border-color: #74b3f6; }
+.report-submit { color: #fff; background: #155697; border-color: #155697; }
+.report-submit:hover { background: #104575; }
+.report-form button:disabled { opacity: 0.6; cursor: wait; }
+.report-error { margin: 0; color: #a92d29; line-height: 1.5; font-size: 0.9rem; }
+.report-location-status, .report-form-note, .report-map-picker > p { margin: 0; color: #595752; line-height: 1.5; font-size: 0.9rem; }
+.report-location-status { overflow-wrap: anywhere; }
+.report-form-note { padding: 12px; background: #f5f6f5; border-radius: 12px; }
+.report-form-actions { justify-content: flex-end; padding-top: 4px; }
+.report-map-picker { display: grid; gap: 10px; min-width: 0; }
+.report-map-picker .map-view--picker { height: 260px; min-height: 260px; border: 1px solid #b9b9b5; border-radius: 12px; overflow: hidden; }
+.map-view--picker .leaflet-container { cursor: crosshair; }
+.map-center-crosshair { position: absolute; top: 50%; left: 50%; z-index: 500; transform: translate(-50%, -50%); color: #155697; font-size: 2rem; text-shadow: 0 0 3px #fff; pointer-events: none; }
+.map-center-button { position: absolute; bottom: 28px; left: 50%; z-index: 500; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+.location-pin span { display: block; width: 26px; height: 26px; background: #155697; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 0 5px rgba(21, 86, 151, 0.25); }
+
 @media (max-width: 900px) {
   .app-frame { width: 100%; margin: 0; border: 0; border-radius: 0; }
   .top-bar { padding: 0 18px; }
@@ -310,6 +445,9 @@ button:focus-visible {
 }
 
 @media (max-width: 520px) {
+  .report-dialog { width: 100%; max-width: 100%; max-height: calc(100dvh - 16px); margin: auto 0 0; padding: 20px 16px; border-radius: 24px 24px 0 0; }
+  .report-form-header h2 { font-size: 1.3rem; }
+  .report-location-actions > button, .report-form-actions > button { flex: 1; }
   .top-bar { min-height: 72px; }
   .brand { gap: 10px; }
   .brand svg { width: 24px; height: 24px; }
