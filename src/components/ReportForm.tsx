@@ -1,171 +1,235 @@
-import { useEffect, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
-import type { Category, Report, ReportLocation, Severity } from '../types'
+import { useEffect, useId, useRef, useState } from 'react'
+import type { FormEvent, KeyboardEvent } from 'react'
+import { categories } from '../data/categories'
+import type { ReportDraft, ReportLocation, Severity } from '../types'
+import { MapView } from './MapView'
+import { validateReportLocation } from '../utils/reportLocation'
 
-type Props = {
-  categories: Category[]
-  location: ReportLocation | null
-  pickingLocation: boolean
-  onLocationChange: (location: ReportLocation) => void
-  onPickLocation: () => void
+type ReportFormProps = {
   onClose: () => void
-  onSubmit: (report: Report) => void
+  onSubmit: (report: ReportDraft) => void
 }
-type Errors = Partial<Record<'category' | 'description' | 'severity' | 'location', string>>
 
-export function ReportForm({ categories, location, pickingLocation, onLocationChange, onPickLocation, onClose, onSubmit }: Props) {
+type Field = 'category' | 'description' | 'severity' | 'location'
+const DESCRIPTION_LIMIT = 140
+const severityOptions: { value: Severity; label: string }[] = [
+  { value: 'low', label: 'Baja' },
+  { value: 'medium', label: 'Media' },
+  { value: 'high', label: 'Alta' },
+]
+const emptyReports: [] = []
+const ignoreReportSelection = () => {}
+
+export function ReportForm({ onClose, onSubmit }: ReportFormProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
-  const requestRef = useRef(0)
+  const categoryRef = useRef<HTMLSelectElement>(null)
+  const descriptionRef = useRef<HTMLTextAreaElement>(null)
+  const severityRef = useRef<HTMLInputElement>(null)
+  const locationRef = useRef<HTMLButtonElement>(null)
+  const gpsRequest = useRef(0)
+  const id = useId()
   const [categoryId, setCategoryId] = useState('')
   const [description, setDescription] = useState('')
   const [severity, setSeverity] = useState<Severity | ''>('')
-  const [errors, setErrors] = useState<Errors>({})
-  const [gpsError, setGpsError] = useState('')
+  const [location, setLocation] = useState<ReportLocation | null>(null)
+  const [locationSource, setLocationSource] = useState<'gps' | 'map'>('map')
+  const [showMap, setShowMap] = useState(false)
   const [locating, setLocating] = useState(false)
+  const [gpsError, setGpsError] = useState('')
+  const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
   const category = categories.find((item) => item.id === categoryId)
 
   useEffect(() => {
-    const trigger = document.activeElement as HTMLElement | null
-    return () => { requestRef.current += 1; queueMicrotask(() => trigger?.focus()) }
+    const dialog = dialogRef.current
+    const previousFocus = document.activeElement as HTMLElement | null
+    const previousOverflow = document.body.style.overflow
+    // Native modal dialogs keep keyboard focus inside and make the background inert.
+    dialog?.showModal()
+    categoryRef.current?.focus()
+    document.body.style.overflow = 'hidden'
+    return () => {
+      gpsRequest.current += 1
+      dialog?.close()
+      document.body.style.overflow = previousOverflow
+      previousFocus?.focus()
+    }
   }, [])
 
-  useEffect(() => {
-    const dialog = dialogRef.current
-    if (!dialog) return
-    if (pickingLocation) dialog.close()
-    else dialog.showModal()
-    return () => dialog.close()
-  }, [pickingLocation])
+  const clearError = (field: Field) => {
+    setErrors((current) => ({ ...current, [field]: undefined }))
+  }
 
-  useEffect(() => {
-    if (pickingLocation) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previous }
-  }, [pickingLocation])
+  const trapFocus = (event: KeyboardEvent<HTMLDialogElement>) => {
+    if (event.key !== 'Tab') return
+    const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), select:not([disabled]), textarea:not([disabled]), input:not([disabled]), a[href], [tabindex="0"]',
+    )).filter((element) => element.getClientRects().length > 0)
+    const first = controls[0]
+    const last = controls[controls.length - 1]
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault()
+      last?.focus()
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault()
+      first?.focus()
+    }
+  }
 
-  const useGps = () => {
+  const selectLocation = (point: ReportLocation, source: 'gps' | 'map' = 'map') => {
+    gpsRequest.current += 1
+    setLocating(false)
     setGpsError('')
+    const error = validateReportLocation(point)
+    if (error) {
+      // A rejected attempt must not silently submit an earlier valid location.
+      setLocation(null)
+      setErrors((current) => ({ ...current, location: error }))
+      return
+    }
+    setLocation(point)
+    setLocationSource(source)
+    clearError('location')
+  }
+
+  const useMyLocation = () => {
+    setGpsError('')
+    if (!window.isSecureContext) {
+      setGpsError('La ubicación requiere HTTPS o localhost. Puedes seleccionar un punto del mapa.')
+      return
+    }
     if (!navigator.geolocation) {
       setGpsError('Tu navegador no permite obtener la ubicación. Selecciona un punto del mapa.')
       return
     }
-    const request = ++requestRef.current
+    const request = ++gpsRequest.current
     setLocating(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        if (request !== requestRef.current) return
-        setLocating(false)
-        onLocationChange({ latitude: coords.latitude, longitude: coords.longitude })
-        setErrors((current) => ({ ...current, location: undefined }))
+        if (request !== gpsRequest.current) return
+        selectLocation({ latitude: coords.latitude, longitude: coords.longitude }, 'gps')
       },
       (error) => {
-        if (request !== requestRef.current) return
+        if (request !== gpsRequest.current) return
         setLocating(false)
         setGpsError(error.code === 1
-          ? 'Permiso de ubicación denegado. Puedes habilitarlo en tu navegador o elegir un punto del mapa.'
+          ? 'Permiso de ubicación denegado. Puedes habilitarlo en el navegador o elegir un punto del mapa.'
           : error.code === 3
-            ? 'La ubicación tardó demasiado. Inténtalo de nuevo o elige un punto del mapa.'
-            : 'No se pudo obtener tu ubicación. Inténtalo de nuevo o elige un punto del mapa.')
+            ? 'La ubicación tardó demasiado. Intenta de nuevo o elige un punto del mapa.'
+            : 'No se pudo obtener tu ubicación. Intenta de nuevo o elige un punto del mapa.')
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
     )
   }
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const next: Errors = {}
-    if (!category) next.category = 'Selecciona una categoría.'
-    if (!description.trim()) next.description = 'Escribe una descripción del incidente.'
-    else if (description.length > 140) next.description = 'La descripción debe tener como máximo 140 caracteres.'
-    if (category?.requiresSeverity && !severity) next.severity = 'Selecciona la severidad.'
-    if (!location || !Number.isFinite(location.latitude) || !Number.isFinite(location.longitude)
-      || Math.abs(location.latitude) > 90 || Math.abs(location.longitude) > 180) {
-      next.location = 'Usa tu ubicación o selecciona un punto del mapa.'
+    const nextErrors: Partial<Record<Field, string>> = {}
+    const trimmedDescription = description.trim()
+    if (!category) nextErrors.category = 'Selecciona una categoría.'
+    if (!trimmedDescription) nextErrors.description = 'Describe brevemente el incidente.'
+    else if (trimmedDescription.length > DESCRIPTION_LIMIT) nextErrors.description = 'La descripción debe tener como máximo 140 caracteres.'
+    if (category?.requiresSeverity && !severity) nextErrors.severity = 'Selecciona la severidad del incidente.'
+    const locationError = validateReportLocation(location)
+    if (locationError) nextErrors.location = locationError
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length) {
+      if (nextErrors.category) categoryRef.current?.focus()
+      else if (nextErrors.description) descriptionRef.current?.focus()
+      else if (nextErrors.severity) severityRef.current?.focus()
+      else locationRef.current?.focus()
+      return
     }
-    setErrors(next)
-    const first = Object.keys(next)[0]
-    if (first) { document.getElementById(`report-${first}`)?.focus(); return }
     if (!category || !location) return
+    // Release background inertness before App updates its live success message.
+    dialogRef.current?.close()
     onSubmit({
-      id: crypto.randomUUID(), categoryId: category.id, description: description.trim(),
-      severity: severity || 'low', ...location,
-      location: `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`,
-      status: 'unverified', createdAt: new Date().toISOString(),
+      categoryId: category.id,
+      description: trimmedDescription,
+      severity: severity || 'low',
+      ...location,
+      location: locationSource === 'gps' ? 'Ubicación obtenida por GPS' : 'Ubicación seleccionada en el mapa',
     })
   }
 
   return (
-    <dialog ref={dialogRef} className="report-dialog" aria-labelledby="report-title"
-      onKeyDown={(event) => {
-        if (event.key !== 'Tab') return
-        const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
-        ))
-        const first = controls[0]
-        const last = controls[controls.length - 1]
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault(); last?.focus()
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault(); first?.focus()
-        }
-      }}
+    <dialog ref={dialogRef} className="report-dialog" aria-labelledby={`${id}-title`} aria-describedby={`${id}-intro`} onKeyDown={trapFocus}
       onCancel={(event) => { event.preventDefault(); onClose() }}>
-      <form noValidate onSubmit={submit} className="report-form">
-        <div className="report-form-heading">
-          <h2 id="report-title">Reportar un incidente</h2>
-          <button type="button" onClick={onClose} aria-label="Cerrar formulario de reporte">×</button>
+      <div className="report-form-header">
+        <div>
+          <h2 id={`${id}-title`}>Reportar un incidente</h2>
+          <p id={`${id}-intro`}>Cuéntanos qué ocurre y dónde. Los campos marcados con * son obligatorios.</p>
         </div>
-        <p>El reporte aparecerá como sin verificar. Se guarda solo durante esta sesión.</p>
+        <button className="report-close" type="button" aria-label="Cerrar formulario de reporte" onClick={onClose}>×</button>
+      </div>
+      <form className="report-form" onSubmit={handleSubmit} noValidate>
         <div className="report-field">
-          <label htmlFor="report-category">Categoría (obligatoria)</label>
-          <select id="report-category" required value={categoryId} aria-invalid={!!errors.category}
-            aria-describedby="category-error" onChange={(event) => {
-              setCategoryId(event.target.value); setSeverity('')
-              setErrors((current) => ({ ...current, category: undefined, severity: undefined }))
-            }}>
+          <label htmlFor={`${id}-category`}>Categoría *</label>
+          <select id={`${id}-category`} ref={categoryRef} value={categoryId} required
+            aria-invalid={!!errors.category} aria-describedby={errors.category ? `${id}-category-error` : undefined}
+            onChange={(event) => { setCategoryId(event.target.value); setSeverity(''); clearError('category'); clearError('severity') }}>
             <option value="">Selecciona una categoría</option>
             {categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
           </select>
-          <span className="field-error" id="category-error">{errors.category}</span>
+          {errors.category && <p className="report-error" id={`${id}-category-error`} role="alert">{errors.category}</p>}
         </div>
+
         <div className="report-field">
-          <label htmlFor="report-description">Descripción breve (obligatoria)</label>
-          <textarea id="report-description" required maxLength={140} rows={3} value={description}
-            aria-invalid={!!errors.description} aria-describedby="description-count description-error"
-            onChange={(event) => { setDescription(event.target.value); setErrors((current) => ({ ...current, description: undefined })) }} />
-          <small id="description-count">{description.length}/140 caracteres</small>
-          <span className="field-error" id="description-error">{errors.description}</span>
+          <label htmlFor={`${id}-description`}>Descripción breve *</label>
+          <textarea id={`${id}-description`} ref={descriptionRef} value={description} required rows={3} maxLength={DESCRIPTION_LIMIT}
+            placeholder="Por ejemplo: calle inundada, el agua cubre la banqueta."
+            aria-invalid={!!errors.description} aria-describedby={`${id}-count${errors.description ? ` ${id}-description-error` : ''}`}
+            onChange={(event) => { setDescription(event.target.value); clearError('description') }} />
+          <span className="report-character-count" id={`${id}-count`}>{description.length}/{DESCRIPTION_LIMIT} caracteres</span>
+          {errors.description && <p className="report-error" id={`${id}-description-error`} role="alert">{errors.description}</p>}
         </div>
-        <div className="report-field">
-          <label htmlFor="report-severity">Severidad ({category?.requiresSeverity ? 'obligatoria' : 'opcional'})</label>
-          <select id="report-severity" value={severity} required={category?.requiresSeverity}
-            aria-invalid={!!errors.severity} aria-describedby="severity-error severity-help"
-            onChange={(event) => { setSeverity(event.target.value as Severity | ''); setErrors((current) => ({ ...current, severity: undefined })) }}>
-            <option value="">Selecciona la severidad</option>
-            <option value="low">Baja</option><option value="medium">Media</option><option value="high">Alta</option>
-          </select>
-          <small id="severity-help">{!category?.requiresSeverity && 'Si no eliges una, se guardará como baja.'}</small>
-          <span className="field-error" id="severity-error">{errors.severity}</span>
-        </div>
-        <fieldset className="report-field">
-          <legend>Ubicación (obligatoria)</legend>
-          <div className="location-actions">
-            <button id="report-location" type="button" onClick={useGps} disabled={locating}
-              aria-describedby="location-error gps-error">{locating ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}</button>
-            <button type="button" onClick={() => {
-              requestRef.current += 1; setLocating(false); setGpsError('')
-              setErrors((current) => ({ ...current, location: undefined }))
-              onPickLocation()
-            }}>Elegir en el mapa</button>
+
+        {category?.requiresSeverity && <fieldset className="report-field report-severity" aria-describedby={errors.severity ? `${id}-severity-error` : undefined}>
+          <legend>Severidad *</legend>
+          <div className="report-severity-options">
+            {severityOptions.map((option, index) => <label key={option.value}>
+              <input ref={index === 0 ? severityRef : undefined} type="radio" name={`${id}-severity`} value={option.value}
+                checked={severity === option.value} required aria-invalid={!!errors.severity}
+                onChange={() => { setSeverity(option.value); clearError('severity') }} />
+              {option.label}
+            </label>)}
           </div>
-          <p role="status">{location ? `Ubicación seleccionada: ${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}` : 'Todavía no has seleccionado una ubicación.'}</p>
-          <span className="field-error" id="location-error">{errors.location}</span>
-          <span className="field-error" id="gps-error" role="alert">{gpsError}</span>
+          {errors.severity && <p className="report-error" id={`${id}-severity-error`} role="alert">{errors.severity}</p>}
+        </fieldset>}
+
+        <fieldset className="report-field report-location" aria-describedby={`${id}-coverage`}>
+          <legend>Ubicación *</legend>
+          <p className="report-location-status" id={`${id}-coverage`}>Solo se aceptan ubicaciones dentro de la zona de cobertura de Ciudad del Carmen.</p>
+          <div className="report-location-actions">
+            <button ref={locationRef} type="button" className="report-secondary" disabled={locating} onClick={useMyLocation}
+              aria-describedby={errors.location ? `${id}-location-error` : undefined}>
+              {locating ? 'Obteniendo ubicación…' : 'Usar mi ubicación'}
+            </button>
+            <button type="button" className="report-secondary" aria-expanded={showMap} aria-controls={`${id}-map`}
+              onClick={() => {
+                gpsRequest.current += 1
+                setLocating(false)
+                setGpsError('')
+                setShowMap((current) => !current)
+              }}>{showMap ? 'Ocultar mapa' : 'Elegir en el mapa'}</button>
+          </div>
+          {gpsError && <p className="report-error" role="alert">{gpsError}</p>}
+          {errors.location && <p className="report-error" id={`${id}-location-error`} role="alert">{errors.location}</p>}
+          <p className="report-location-status" role="status">
+            {locating ? 'Esperando la ubicación del dispositivo.' : location
+              ? `Ubicación seleccionada: ${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`
+              : 'Aún no has seleccionado una ubicación.'}
+          </p>
+          {showMap && <div id={`${id}-map`} className="report-map-picker">
+            <p>Toca un punto del mapa. Con teclado, mueve el mapa con las flechas o WASD y pulsa «Usar el centro del mapa».</p>
+            <MapView reports={emptyReports} categories={categories} selectedId={null} onSelectReport={ignoreReportSelection}
+              onSelectLocation={selectLocation} selectedLocation={location} />
+          </div>}
         </fieldset>
-        <div className="report-form-footer">
-          <button type="button" onClick={onClose}>Cancelar</button>
-          <button className="submit-report" type="submit" disabled={locating}>Crear reporte</button>
+
+        <p className="report-form-note">El reporte se mostrará como «sin verificar». En esta versión se guarda durante la sesión y se pierde al recargar.</p>
+        <div className="report-form-actions">
+          <button type="button" className="report-secondary" onClick={onClose}>Cancelar</button>
+          <button type="submit" className="report-submit" disabled={locating}>Crear reporte</button>
         </div>
       </form>
     </dialog>

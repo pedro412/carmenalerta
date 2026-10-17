@@ -44,12 +44,11 @@ export type MapViewProps = {
   categories: Category[]
   selectedId: string | null
   onSelectReport: (id: string) => void
-  pickingLocation?: boolean
-  onMapClick?: (location: ReportLocation) => void
-  onCancelLocation?: () => void
+  onSelectLocation?: (location: ReportLocation) => void
+  selectedLocation?: ReportLocation | null
 }
 
-export function MapView({ reports, categories, selectedId, onSelectReport, pickingLocation = false, onMapClick, onCancelLocation }: MapViewProps) {
+export function MapView({ reports, categories, selectedId, onSelectReport, onSelectLocation, selectedLocation }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<L.Map | null>(null)
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null)
@@ -93,6 +92,34 @@ export function MapView({ reports, categories, selectedId, onSelectReport, picki
   }, [])
 
   useEffect(() => {
+    const map = mapRef.current
+    if (!map || !onSelectLocation) return
+    const selectPoint = (event: L.LeafletMouseEvent) => {
+      const point = event.latlng.wrap()
+      onSelectLocation({ latitude: point.lat, longitude: point.lng })
+    }
+    map.on('click', selectPoint)
+    return () => { map.off('click', selectPoint) }
+  }, [onSelectLocation])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !selectedLocation) return
+    const point: L.LatLngTuple = [selectedLocation.latitude, selectedLocation.longitude]
+    const marker = L.marker(point, {
+      icon: L.divIcon({
+        className: 'location-pin',
+        html: '<span aria-hidden="true"></span>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13],
+      }),
+      keyboard: false,
+    }).addTo(map)
+    if (!map.getBounds().contains(point)) map.setView(point, 16)
+    return () => { marker.remove() }
+  }, [selectedLocation])
+
+  useEffect(() => {
     const cluster = clusterRef.current
     if (!cluster) return
 
@@ -101,71 +128,31 @@ export function MapView({ reports, categories, selectedId, onSelectReport, picki
     reports.forEach((report) => {
       const color = colorById.get(report.categoryId) ?? DEFAULT_MARKER_COLOR
       L.marker([report.latitude, report.longitude], { icon: markerIcon(color, report.id === selectedId) })
-        .on('click', () => {
-          if (pickingLocation) onMapClick?.({ latitude: report.latitude, longitude: report.longitude })
-          else onSelectReport(report.id)
-        })
+        .on('click', () => onSelectReport(report.id))
         .addTo(cluster)
     })
-  }, [reports, categories, selectedId, onSelectReport, pickingLocation, onMapClick])
+  }, [reports, categories, selectedId, onSelectReport])
 
   useEffect(() => {
-    if (selectedReport && !pickingLocation) {
-      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 18, { duration: 1.5 })
+    if (selectedReport) {
+      mapRef.current?.flyTo([selectedReport.latitude, selectedReport.longitude], 16, { duration: 1.5 })
     }
-  }, [selectedReport?.latitude, selectedReport?.longitude, pickingLocation])
-
-  useEffect(() => {
-    const map = mapRef.current
-    if (!map || !pickingLocation) return
-    map.stop()
-    const container = map.getContainer()
-    const choose = (point: L.LatLng) => onMapClick?.({ latitude: point.lat, longitude: point.lng })
-    const click = (event: L.LeafletMouseEvent) => choose(event.latlng)
-    const keydown = (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && event.target === container) {
-        event.preventDefault()
-        choose(map.getCenter())
-      }
-    }
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { event.preventDefault(); onCancelLocation?.() }
-    }
-    map.on('click', click)
-    container.addEventListener('keydown', keydown)
-    document.addEventListener('keydown', escape)
-    const frame = requestAnimationFrame(() => {
-      container.scrollIntoView({ block: 'center' })
-      container.focus({ preventScroll: true })
-      map.invalidateSize()
-    })
-    return () => {
-      cancelAnimationFrame(frame)
-      map.off('click', click)
-      container.removeEventListener('keydown', keydown)
-      document.removeEventListener('keydown', escape)
-    }
-  }, [pickingLocation, onMapClick, onCancelLocation])
+  }, [selectedReport?.latitude, selectedReport?.longitude])
 
   return (
-    <section className={pickingLocation ? 'map-view is-picking' : 'map-view'} aria-label={`Mapa de incidentes: ${reports.length} visibles`}>
-      <div className="map-canvas" ref={containerRef} tabIndex={0}
-        aria-label="Mapa de incidentes" aria-describedby={pickingLocation ? 'map-pick-help' : undefined} />
-      {pickingLocation && <>
-        <span className="map-crosshair" aria-hidden="true">＋</span>
-        <div className="map-pick-controls">
-          <p id="map-pick-help" role="status">Toca un punto del mapa. Con teclado: mueve con las flechas o WASD y pulsa Enter para elegir el centro.</p>
-          <button type="button" onClick={() => {
-            const point = mapRef.current?.getCenter()
-            if (point) onMapClick?.({ latitude: point.lat, longitude: point.lng })
-          }}>Usar el centro del mapa</button>
-          <button type="button" onClick={onCancelLocation}>Volver al formulario</button>
-        </div>
+    <section className={onSelectLocation ? 'map-view map-view--picker' : 'map-view'} aria-label={onSelectLocation ? 'Seleccionar ubicación del reporte' : `Mapa de incidentes: ${reports.length} visibles`}>
+      <div className="map-canvas" ref={containerRef} />
+      {onSelectLocation && <>
+        <span className="map-center-crosshair" aria-hidden="true">＋</span>
+        <button className="map-center-button" type="button" onClick={() => {
+          const center = mapRef.current?.getCenter().wrap()
+          if (center) onSelectLocation({ latitude: center.lat, longitude: center.lng })
+        }}>Usar el centro del mapa</button>
       </>}
-      <p className="map-hint">
+      {!onSelectLocation && <p className="map-hint">
         <MoveIcon />
         WASD para mover · rueda para zoom
-      </p>
+      </p>}
     </section>
   )
 }

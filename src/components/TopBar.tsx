@@ -1,5 +1,6 @@
 import { isActiveReport } from '../data/filters'
-import type { Report } from '../types'
+import type { Report, ReportDraft } from '../types'
+import { Reporte } from './Reporte'
 
 function BellIcon() {
   return (
@@ -9,9 +10,12 @@ function BellIcon() {
   )
 }
 
-type TopBarProps = { reports: Report[]; onReport: () => void }
+type TopBarProps = {
+  reports: Report[]
+  onCreateReport: (report: ReportDraft) => void
+}
 
-export function TopBar({ reports, onReport }: TopBarProps) {
+export function TopBar({ reports, onCreateReport }: TopBarProps) {
   const activeReports = reports.filter(isActiveReport)
   const criticalCount = activeReports.filter((report) => report.severity === 'high').length
 
@@ -26,10 +30,7 @@ export function TopBar({ reports, onReport }: TopBarProps) {
       <div className="top-actions">
         <span className="summary summary--critical">{criticalCount} críticos</span>
         <span className="summary">{activeReports.length} activos</span>
-        <button className="report-button" type="button" onClick={onReport} aria-haspopup="dialog">
-          <span aria-hidden="true">＋</span>
-          Reportar
-        </button>
+        <Reporte onCreateReport={onCreateReport} />
         <button className="more-button" type="button" aria-label="Más opciones">
           •••
         </button>

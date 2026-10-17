@@ -23,6 +23,18 @@ button:focus-visible {
 
 #root { min-height: 100vh; }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .app-frame {
   width: calc(100% - 20px);
   min-height: calc(100vh - 8px);
@@ -76,7 +88,7 @@ button:focus-visible {
   white-space: nowrap;
 }
 
-.top-actions { gap: 16px; flex-shrink: 0; }
+.top-actions { gap: 16px; }
 
 .summary {
   padding: 9px 20px;
@@ -106,16 +118,48 @@ button:focus-visible {
   padding: 0 24px;
   border-radius: 16px;
   font-size: 1.3rem;
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease,
+    border-color 180ms ease, box-shadow 180ms ease;
 }
 
-.report-button span { display: inline-flex; align-items: center; justify-content: center; width: 1em; height: 1em; line-height: 1; font-size: 1.5em; font-weight: 300; flex-shrink: 0; }
+.report-button-icon {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 300;
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .report-button:hover {
+    transform: translateY(-2px);
+    background-color: #edf6ff;
+    border-color: #74b3f6;
+    box-shadow: 0 5px 12px rgba(21, 86, 151, 0.16);
+  }
+
+  .report-button:hover .report-button-icon { transform: rotate(90deg); }
+}
+
+.report-button:active {
+  background-color: #d4e8ff;
+  border-color: #74b3f6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-button,
+  .report-button-icon { transition: none; }
+
+  .report-button:hover,
+  .report-button:hover .report-button-icon { transform: none; }
+}
 
 .more-button {
   width: 50px;
-  margin-left: 0;
+  margin-left: -17px;
   color: #5d5c58;
   border-color: transparent;
-  border-radius: 16px;
+  border-radius: 0 16px 16px 0;
   font-weight: 800;
 }
 
@@ -286,6 +330,8 @@ button:focus-visible {
 
 .incident.is-selected .incident-copy > span { color: #1f65a8; }
 
+.incident-copy > .incident-status { width: fit-content; padding: 3px 8px; color: #595752; background: #f5f6f5; border-radius: 8px; font-size: 0.8rem; }
+
 .incident time {
   color: #898780;
   font-size: 1rem;
@@ -300,6 +346,95 @@ button:focus-visible {
   text-align: center;
 }
 
+.report-dialog {
+  width: min(600px, calc(100% - 32px));
+  max-height: calc(100dvh - 40px);
+  padding: 28px;
+  color: #171716;
+  background: #fff;
+  border: 1px solid #e2e2df;
+  border-radius: 24px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.report-dialog::backdrop { background: rgba(17, 30, 44, 0.5); }
+.report-form-header { display: flex; align-items: flex-start; gap: 16px; }
+.report-form-header h2 { margin: 0; font-size: 1.5rem; }
+.report-form-header p { margin: 8px 0 24px; color: #595752; line-height: 1.5; }
+.report-close {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #595752;
+  background: #f5f6f5;
+  border: 0;
+  border-radius: 12px;
+  font-size: 1.7rem;
+  cursor: pointer;
+}
+.report-form { display: grid; gap: 22px; }
+.report-field { display: grid; gap: 8px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.report-field > label, .report-field legend { padding: 0; font-weight: 600; }
+.report-field legend { margin-bottom: 10px; }
+.report-field select, .report-field textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px;
+  color: #171716;
+  background: #fff;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 1rem;
+}
+.report-field textarea { resize: vertical; }
+.report-field select:focus-visible, .report-field textarea:focus-visible,
+.report-field input:focus-visible { outline: 3px solid #74b3f6; outline-offset: 2px; }
+.report-field [aria-invalid="true"] { border-color: #a92d29; }
+.report-character-count { color: #595752; text-align: right; font-size: 0.85rem; }
+.report-severity-options, .report-location-actions, .report-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.report-severity-options label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.report-severity-options label:has(input:checked) { color: #104d86; background: #edf6ff; border-color: #74b3f6; }
+.report-severity-options input { margin: 0; accent-color: #155697; }
+.report-secondary, .report-submit, .map-center-button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #b9b9b5;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.report-secondary, .map-center-button { color: #155697; background: #fff; }
+.report-secondary:hover, .map-center-button:hover { background: #edf6ff; border-color: #74b3f6; }
+.report-submit { color: #fff; background: #155697; border-color: #155697; }
+.report-submit:hover { background: #104575; }
+.report-form button:disabled { opacity: 0.6; cursor: wait; }
+.report-error { margin: 0; color: #a92d29; line-height: 1.5; font-size: 0.9rem; }
+.report-location-status, .report-form-note, .report-map-picker > p { margin: 0; color: #595752; line-height: 1.5; font-size: 0.9rem; }
+.report-location-status { overflow-wrap: anywhere; }
+.report-form-note { padding: 12px; background: #f5f6f5; border-radius: 12px; }
+.report-form-actions { justify-content: flex-end; padding-top: 4px; }
+.report-map-picker { display: grid; gap: 10px; min-width: 0; }
+.report-map-picker .map-view--picker { height: 260px; min-height: 260px; border: 1px solid #b9b9b5; border-radius: 12px; overflow: hidden; }
+.map-view--picker .leaflet-container { cursor: crosshair; }
+.map-center-crosshair { position: absolute; top: 50%; left: 50%; z-index: 500; transform: translate(-50%, -50%); color: #155697; font-size: 2rem; text-shadow: 0 0 3px #fff; pointer-events: none; }
+.map-center-button { position: absolute; bottom: 28px; left: 50%; z-index: 500; transform: translateX(-50%); width: max-content; max-width: calc(100% - 24px); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+.location-pin span { display: block; width: 26px; height: 26px; background: #155697; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 0 0 5px rgba(21, 86, 151, 0.25); }
+
 @media (max-width: 900px) {
   .app-frame { width: 100%; margin: 0; border: 0; border-radius: 0; }
   .top-bar { padding: 0 18px; }
@@ -310,6 +445,9 @@ button:focus-visible {
 }
 
 @media (max-width: 520px) {
+  .report-dialog { width: 100%; max-width: 100%; max-height: calc(100dvh - 16px); margin: auto 0 0; padding: 20px 16px; border-radius: 24px 24px 0 0; }
+  .report-form-header h2 { font-size: 1.3rem; }
+  .report-location-actions > button, .report-form-actions > button { flex: 1; }
   .top-bar { min-height: 72px; }
   .brand { gap: 10px; }
   .brand svg { width: 24px; height: 24px; }
@@ -319,166 +457,4 @@ button:focus-visible {
   .map-view { min-height: 430px; }
   .map-hint { display: none; }
   .incident-panel { padding: 18px 14px 30px; }
-}
-
-/* Creación de reportes y selección accesible de ubicación. */
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-.report-dialog { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 1px solid #d2d2ce; border-radius: 20px; color: #171716; background: #fff; box-shadow: 0 20px 70px #0004; }
-.report-dialog::backdrop { background: #15233399; }
-.report-form { display: grid; gap: 16px; padding: 24px; }
-.report-form-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.report-form h2 { margin: 0; font-size: 1.35rem; }
-.report-form p { margin: 0; line-height: 1.5; color: #55534f; }
-.report-field { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
-.report-field label, .report-field legend { font-weight: 600; margin-bottom: 4px; }
-.report-field select, .report-field textarea { width: 100%; min-width: 0; min-height: 44px; padding: 10px; border: 1px solid #8b8b87; border-radius: 8px; font: inherit; background: #fff; color: #171716; }
-.report-field textarea { resize: vertical; }
-.report-field [aria-invalid="true"] { border-color: #ab2525; }
-.report-field small { color: #55534f; }
-.field-error { color: #a52121; font-size: .9rem; }
-.field-error:empty { display: none; }
-.location-actions, .report-form-footer { display: flex; flex-wrap: wrap; gap: 10px; }
-.report-form-footer { justify-content: flex-end; }
-.report-form button, .map-pick-controls button { min-height: 44px; padding: 10px 14px; border: 1px solid #b6b6b0; border-radius: 10px; background: #fff; color: #171716; cursor: pointer; }
-.report-form-heading button { min-width: 44px; font-size: 1.4rem; }
-.report-form .submit-report { background: #155697; border-color: #155697; color: white; }
-.report-form button:disabled { opacity: .65; cursor: wait; }
-.report-field :focus-visible, .map-canvas:focus-visible { outline: 3px solid #155697; outline-offset: 2px; }
-.is-picking .map-canvas { cursor: crosshair; }
-.is-picking .map-hint { display: none; }
-.map-crosshair { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 1000; pointer-events: none; font-size: 36px; color: #123f6c; text-shadow: 0 0 3px white; }
-.map-pick-controls { position: absolute; bottom: 12px; left: 12px; right: 12px; z-index: 1000; padding: 12px; border-radius: 12px; background: white; box-shadow: 0 2px 12px #0003; display: flex; flex-wrap: wrap; gap: 8px; }
-.map-pick-controls p { width: 100%; margin: 0; font-size: .9rem; }
-@media (max-width: 520px) {
-  .report-dialog { width: 100%; max-width: 100%; max-height: 92dvh; margin: auto 0 0; border-radius: 20px 20px 0 0; }
-  .report-form { padding: 20px 16px max(20px, env(safe-area-inset-bottom)); }
-  .location-actions button, .report-form-footer button { flex: 1; }
-}
-@media (prefers-reduced-motion: reduce) { .marker-pulse-ring { animation: none; } }
-/* Respuesta visual del botón Reportar. */
-.report-button {
-  justify-content: center;
-  flex-shrink: 0;
-  line-height: 1;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease,
-    color 160ms ease, transform 200ms ease, box-shadow 200ms ease;
-}
-.report-button span {
-  display: inline-flex;
-  transition: transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-@media (hover: hover) {
-  .report-button:hover {
-    background-color: #e3f0ff;
-    border-color: #155697;
-    color: #155697;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgb(21 86 151 / 18%);
-  }
-  .report-button:hover span { transform: rotate(90deg); }
-}
-.report-button:focus-visible {
-  background-color: #e3f0ff;
-  border-color: #155697;
-  color: #155697;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgb(21 86 151 / 18%);
-}
-.report-button:focus-visible span { transform: rotate(90deg); }
-.report-button:active {
-  background-color: #155697;
-  border-color: #155697;
-  color: #fff;
-  transform: translateY(0) scale(0.96);
-  box-shadow: 0 1px 3px rgb(21 86 151 / 15%);
-}
-@media (prefers-reduced-motion: reduce) {
-  .report-button, .report-button span { transition: none; }
-  .report-button:hover, .report-button:focus-visible, .report-button:active,
-  .report-button:hover span, .report-button:focus-visible span { transform: none; }
-}
-
-/* Permite acomodar la barra sin recortar los controles en pantallas estrechas. */
-.top-bar { flex-wrap: wrap; padding-top: 12px; padding-bottom: 12px; }
-.top-actions { margin-left: auto; }
-@media (max-width: 520px) {
-  .top-bar { gap: 12px; }
-}
-/* Formulario con la paleta azul de la aplicación. */
-.report-dialog {
-  border: 1px solid #c5d9ee;
-  border-radius: 28px;
-  background: #f2f7fd;
-  color: #18334f;
-  box-shadow: 0 24px 70px rgb(18 63 108 / 22%);
-  overflow-x: hidden;
-}
-.report-dialog::backdrop { background: rgb(18 40 65 / 48%); }
-.report-form { gap: 18px; padding: 28px; }
-.report-form-heading {
-  padding-bottom: 16px;
-  border-bottom: 1px solid #d4e2f1;
-}
-.report-form h2 { color: #155697; line-height: 1.3; }
-.report-form p, .report-field small { color: #496078; }
-.report-field label, .report-field legend { color: #234664; }
-.report-field select, .report-field textarea {
-  border-color: #9db7d0;
-  border-radius: 14px;
-  padding: 12px;
-  background: #fff;
-  color: #18334f;
-}
-.report-field [aria-invalid="true"] { border-color: #ab2525; }
-.report-form button {
-  border-color: #a9c2db;
-  border-radius: 14px;
-  color: #155697;
-  background: #fff;
-  transition: background-color 160ms ease, border-color 160ms ease;
-}
-.report-form-heading button { flex-shrink: 0; background: #e3eefb; }
-.report-form button:hover:not(:disabled) { background: #e0edfb; border-color: #155697; }
-.report-form .submit-report { color: #fff; background: #155697; border-color: #155697; }
-.report-form .submit-report:hover:not(:disabled) { background: #104577; border-color: #104577; }
-.report-form-footer { padding-top: 16px; border-top: 1px solid #d4e2f1; }
-@media (max-width: 520px) {
-  .report-dialog {
-    width: calc(100% - 16px);
-    max-height: calc(100dvh - 24px);
-    margin: auto auto 8px;
-    border-radius: 24px;
-  }
-  .report-form { padding: 20px 16px max(20px, env(safe-area-inset-bottom)); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .report-form button { transition: none; }
-}
-/* El desplazamiento queda dentro del marco redondeado del formulario. */
-.report-dialog {
-  overflow: hidden;
-  padding: 12px;
-}
-.report-form {
-  max-height: calc(100dvh - 58px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-gutter: stable;
-  scrollbar-width: thin;
-  scrollbar-color: #9db7d0 #e3eefb;
-  overscroll-behavior-y: contain;
-  padding: 16px;
-}
-.report-form::-webkit-scrollbar { width: 8px; }
-.report-form::-webkit-scrollbar-track { background: #e3eefb; border-radius: 8px; }
-.report-form::-webkit-scrollbar-thumb { background: #9db7d0; border-radius: 8px; }
-.report-form::-webkit-scrollbar-thumb:hover { background: #155697; }
-@media (max-width: 520px) {
-  .report-dialog { padding: 10px; }
-  .report-form {
-    max-height: calc(100dvh - 46px);
-    padding: 10px 6px max(10px, env(safe-area-inset-bottom));
-  }
 }
