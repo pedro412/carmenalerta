@@ -55,3 +55,12 @@ OpenStreetMap): [Plaza Real](https://www.openstreetmap.org/way/224513587),
 Al cambiar los reportes de ejemplo, el panel y los contadores se actualizan
 desde el mismo estado de `App.tsx`. Los chips existentes muestran solo reportes
 activos; la categoría «Otro» aparece únicamente al elegir «Todos».
+
+
+## Pruebas
+
+Para correr las pruebas localmente ejecuta el comando:
+
+```bash
+npm test
+```
